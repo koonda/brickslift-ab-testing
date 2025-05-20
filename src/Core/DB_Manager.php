@@ -40,22 +40,22 @@ class DB_Manager {
 		// Table: blft_tracking
 		$table_name_tracking = $wpdb->prefix . 'blft_tracking';
 		$sql_tracking        = "CREATE TABLE $table_name_tracking (
-			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-			test_id BIGINT(20) UNSIGNED NOT NULL,
-			variant_id VARCHAR(255) NOT NULL,
-			visitor_hash VARCHAR(64) NOT NULL,
-			event_type VARCHAR(50) NOT NULL, /* e.g., 'view', 'conversion' */
-			event_timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-			page_url TEXT,
-			goal_type VARCHAR(100) DEFAULT NULL,
-			goal_details TEXT DEFAULT NULL,
-			processed TINYINT(1) NOT NULL DEFAULT 0, /* 0 = not processed, 1 = processed */
-			PRIMARY KEY  (id),
-			KEY idx_test_variant (test_id, variant_id),
-			KEY idx_visitor_event (visitor_hash, event_type),
-			KEY idx_goal_type (goal_type),
-			KEY idx_event_timestamp_processed (event_timestamp, processed) /* Index for querying unprocessed events */
-		) $charset_collate;";
+		          id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+		          test_id BIGINT(20) UNSIGNED NOT NULL,
+		          variant_id VARCHAR(255) NOT NULL,
+		          visitor_hash VARCHAR(64) NOT NULL,
+		          event_type VARCHAR(50) NOT NULL,
+		          event_timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		          page_url TEXT,
+		          goal_type VARCHAR(100) DEFAULT NULL,
+		          goal_details TEXT DEFAULT NULL,
+		          processed TINYINT(1) NOT NULL DEFAULT 0,
+		          PRIMARY KEY  (id),
+		          KEY idx_test_variant (test_id, variant_id),
+		          KEY idx_visitor_event (visitor_hash, event_type),
+		          KEY idx_goal_type (goal_type),
+		          KEY idx_event_timestamp_processed (event_timestamp, processed)
+		      ) $charset_collate;";
 		dbDelta( $sql_tracking );
 
 		// Table: blft_stats_aggregated

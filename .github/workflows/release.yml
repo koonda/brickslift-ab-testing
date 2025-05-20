@@ -113,5 +113,6 @@ jobs:
           files: ${{ steps.release_vars.outputs.zip_name }} # Path to the release asset (the .zip file)
 
       - name: Output Release URL
-        run: echo "Release URL: ${{ steps.create_release.outputs.html_url }}"
+        run: |
+          echo "Release URL: ${{ steps.create_release.outputs.html_url }}"
         # Displays the URL of the created release in the workflow log

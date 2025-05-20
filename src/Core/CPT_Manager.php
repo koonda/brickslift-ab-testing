@@ -181,10 +181,10 @@ class CPT_Manager {
 			'_blft_goal_fs_trigger'           => [ 'type' => 'string', 'sanitize' => 'sanitize_key', 'desc' => 'Trigger for form submission (submit_event, success_class, thank_you_url).' ],
 			'_blft_goal_fs_thank_you_url'     => [ 'type' => 'string', 'sanitize' => 'esc_url_raw', 'desc' => 'Thank you URL for form submission goal.' ],
 			'_blft_goal_fs_success_class'     => [ 'type' => 'string', 'sanitize' => 'sanitize_text_field', 'desc' => 'Success class for form submission goal.' ],
-			'_blft_goal_wc_any_product'       => [ 'type' => 'boolean', 'sanitize' => 'rest_sanitize_boolean', 'desc' => 'WC add to cart any product.' ],
-			'_blft_goal_wc_product_id'        => [ 'type' => 'integer', 'sanitize' => 'absint', 'desc' => 'WC product ID for add to cart goal.' ],
-			'_blft_goal_sd_percentage'        => [ 'type' => 'integer', 'sanitize' => 'absint', 'desc' => 'Scroll depth percentage.' ],
-			'_blft_goal_top_seconds'          => [ 'type' => 'integer', 'sanitize' => 'absint', 'desc' => 'Time on page in seconds.' ],
+			'_blft_goal_wc_any_product'       => [ 'type' => 'boolean', 'sanitize' => 'rest_sanitize_boolean', 'desc' => 'WC add to cart any product.', 'default' => false ],
+			'_blft_goal_wc_product_id'        => [ 'type' => 'integer', 'sanitize' => 'absint', 'desc' => 'WC product ID for add to cart goal.', 'default' => 0 ],
+			'_blft_goal_sd_percentage'        => [ 'type' => 'integer', 'sanitize' => 'absint', 'desc' => 'Scroll depth percentage.', 'default' => 0 ],
+			'_blft_goal_top_seconds'          => [ 'type' => 'integer', 'sanitize' => 'absint', 'desc' => 'Time on page in seconds.', 'default' => 0 ],
 			'_blft_goal_cje_event_name'       => [ 'type' => 'string', 'sanitize' => 'sanitize_text_field', 'desc' => 'Custom JavaScript event name.' ],
 		];
 
