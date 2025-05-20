@@ -3,7 +3,7 @@
  * Plugin Name: BricksLift A/B Testing
  * Plugin URI: https://brickslift.com/
  * Description: A/B testing for Bricks Builder.
- * Version: 0.4.6
+ * Version: 0.4.7
  * Author: Adam Kotala
  * Author URI: https://digistorm.cz
  * License: GPLv2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
-define( 'BLFT_VERSION', '0.4.6' );
+define( 'BLFT_VERSION', '0.4.7' );
 define( 'BLFT_PLUGIN_FILE', __FILE__ );
 define( 'BLFT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BLFT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -75,3 +75,18 @@ register_activation_hook( __FILE__, [ '\BricksLiftAB\Core\Plugin', 'activate' ] 
  * Deactivation hook.
  */
 register_deactivation_hook( __FILE__, [ '\BricksLiftAB\Core\Plugin', 'deactivate' ] );
+// Temporary debug action to inspect $wp_scripts
+add_action( 'admin_print_footer_scripts', function() {
+    global $wp_scripts;
+    if ( isset( $wp_scripts->registered['blft-admin-app'] ) ) {
+        error_log( '[BricksLift A/B Debug] $wp_scripts->registered[\'blft-admin-app\']: ' . print_r( $wp_scripts->registered['blft-admin-app'], true ) );
+        if ( isset( $wp_scripts->registered['blft-admin-app']->extra['data'] ) ) {
+            error_log( '[BricksLift A/B Debug] Localized data for blft-admin-app: ' . $wp_scripts->registered['blft-admin-app']->extra['data'] );
+        } else {
+            error_log( '[BricksLift A/B Debug] NO Localized data found for blft-admin-app in $wp_scripts.' );
+        }
+    } else {
+        error_log( '[BricksLift A/B Debug] blft-admin-app NOT FOUND in $wp_scripts->registered at admin_print_footer_scripts.' );
+    }
+    // Optional: error_log( '[BricksLift A/B Debug] $wp_scripts->queue: ' . print_r( $wp_scripts->queue, true ) );
+}, 9999 ); // High priority to run late

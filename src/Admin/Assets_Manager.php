@@ -21,10 +21,25 @@ class Assets_Manager {
 
 	const ADMIN_SCRIPT_HANDLE = 'blft-admin-app';
 
+	private $page_slugs;
+	private $target_hook_suffix;
+
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
+		$this->page_slugs = [
+			'dashboard' => 'brickslift-ab-dashboard',
+			// Add other page slugs here if needed, e.g., 'settings' => 'brickslift-ab-settings'
+		];
+
+		// Construct the target hook suffix once in the constructor.
+		// The parent slug for a CPT submenu page is the CPT slug itself.
+		$this->target_hook_suffix = get_plugin_page_hookname( $this->page_slugs['dashboard'], \BricksLiftAB\Core\CPT_Manager::CPT_SLUG );
+
+		error_log('[BricksLift A/B Debug] Assets_Manager constructed. Target hook suffix set to: ' . $this->target_hook_suffix);
+		error_log('[BricksLift A/B Debug] Page slugs for target_hook_suffix: ' . print_r($this->page_slugs, true));
+
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
 	}
 
@@ -42,16 +57,17 @@ class Assets_Manager {
 		// WordPress also generates a hook for the CPT's main listing page: 'edit.php?post_type=blft_test' -> 'edit-blft_test'
 		// And for the CPT's add new page: 'post-new.php?post_type=blft_test' -> 'post-new-blft_test'
 		// We only want to load assets on our custom dashboard page.
-		$target_hook = \BricksLiftAB\Core\CPT_Manager::CPT_SLUG . '_page_brickslift-ab-dashboard';
 
-		// Debugging: Log hook suffix and target hook
-		error_log('[BricksLift A/B Debug] enqueue_admin_assets called. Hook suffix: ' . $hook_suffix . ' | Target hook: ' . $target_hook);
+		// Log the values for debugging
+		error_log('[BricksLift A/B Debug] In enqueue_admin_assets. Current hook_suffix: ' . $hook_suffix);
+		error_log('[BricksLift A/B Debug] Target hook_suffix from constructor: ' . $this->target_hook_suffix);
+		error_log('[BricksLift A/B Debug] Comparison result (target === current): ' . ($this->target_hook_suffix === $hook_suffix ? 'true' : 'false'));
 
-		if ( $target_hook !== $hook_suffix ) {
-			error_log('[BricksLift A/B Debug] Hooks do not match. Assets not enqueued for ' . $hook_suffix);
+		if ( $this->target_hook_suffix !== $hook_suffix ) {
+			error_log('[BricksLift A/B Debug] Hooks do not match. Assets not enqueued. Current: \'' . $hook_suffix . '\', Target: \'' . $this->target_hook_suffix . '\'');
 			return;
 		}
-		error_log('[BricksLift A/B Debug] Hooks matched! Proceeding to enqueue assets for ' . $hook_suffix);
+		error_log('[BricksLift A/B Debug] Hooks matched! Proceeding to enqueue assets. Current: \'' . $hook_suffix . '\', Target: \'' . $this->target_hook_suffix . '\'');
 
 		$script_asset_path = BLFT_PLUGIN_DIR . 'admin-ui/build/index.asset.php';
 		$script_url        = BLFT_PLUGIN_URL . 'admin-ui/build/index.js';
