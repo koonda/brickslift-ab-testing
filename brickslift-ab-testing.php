@@ -3,7 +3,7 @@
  * Plugin Name: BricksLift A/B Testing
  * Plugin URI: https://brickslift.com/
  * Description: A/B testing for Bricks Builder.
- * Version: 0.4.4
+ * Version: 0.4.5
  * Author: Adam Kotala
  * Author URI: https://digistorm.cz
  * License: GPLv2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
-define( 'BLFT_VERSION', '0.4.4' );
+define( 'BLFT_VERSION', '0.4.5' );
 define( 'BLFT_PLUGIN_FILE', __FILE__ );
 define( 'BLFT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BLFT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

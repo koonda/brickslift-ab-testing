@@ -72,21 +72,30 @@ class Assets_Manager {
 
 		// Removed wp_die for further debugging. Allowing enqueue functions to run.
 
-		// TEMP DEBUG: Override dependencies to test for issues with generated ones
-		$hardcoded_dependencies = ['wp-element', 'wp-i18n', 'wp-api-fetch', 'wp-components'];
-		error_log('[BricksLift A/B Debug] Original dependencies: ' . implode(', ', $script_asset['dependencies']));
-		error_log('[BricksLift A/B Debug] Using hardcoded dependencies: ' . implode(', ', $hardcoded_dependencies));
+		// Use dependencies from asset file, but filter out 'react' and 'react-jsx-runtime'
+		$original_dependencies = $script_asset['dependencies'];
+		$filtered_dependencies = array_filter($original_dependencies, function($dep) {
+			return $dep !== 'react' && $dep !== 'react-jsx-runtime';
+		});
+		// Ensure 'wp-element' is present if React-related dependencies were filtered, as it should provide the React abstraction.
+		if (in_array('react', $original_dependencies, true) || in_array('react-jsx-runtime', $original_dependencies, true)) {
+			if (!in_array('wp-element', $filtered_dependencies, true)) {
+				$filtered_dependencies[] = 'wp-element'; // Add wp-element if not already there
+			}
+		}
+		$filtered_dependencies = array_unique($filtered_dependencies); // Remove duplicates if any
 
+		error_log('[BricksLift A/B Debug] Original dependencies: ' . implode(', ', $original_dependencies));
+		error_log('[BricksLift A/B Debug] Using filtered dependencies: ' . implode(', ', $filtered_dependencies));
 
 		wp_enqueue_script(
 			self::ADMIN_SCRIPT_HANDLE,
 			$script_url,
-			// $script_asset['dependencies'], // Use original dependencies
-			$hardcoded_dependencies, // Use hardcoded minimal dependencies for testing
+			$filtered_dependencies, // Use filtered dependencies
 			$script_asset['version'],
 			true // Load in footer
 		);
-		error_log('[BricksLift A/B Debug] wp_enqueue_script called for ' . self::ADMIN_SCRIPT_HANDLE . ' with ' . count($hardcoded_dependencies) . ' hardcoded dependencies.');
+		error_log('[BricksLift A/B Debug] wp_enqueue_script called for ' . self::ADMIN_SCRIPT_HANDLE . ' with ' . count($filtered_dependencies) . ' filtered dependencies.');
 
 		wp_enqueue_style(
 			self::ADMIN_SCRIPT_HANDLE . '-style', // Use a related handle for the style

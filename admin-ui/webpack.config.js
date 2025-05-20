@@ -2,5 +2,5 @@ const defaultConfig = require('@wordpress/scripts/config/webpack.config');
 
 module.exports = {
   ...defaultConfig,
-  devtool: false,
+  devtool: 'eval-source-map',
 };
