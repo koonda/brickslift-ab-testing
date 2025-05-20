@@ -70,25 +70,28 @@ class Assets_Manager {
 		$script_asset = require $script_asset_path;
 		error_log('[BricksLift A/B Debug] Script asset path loaded: ' . $script_asset_path);
 
-		// Debugging: Halt if hook matches and asset file is found and loaded
-		$debug_message = '[BricksLift A/B Debug] HALTING EXECUTION: Hook (' . $hook_suffix . ') matched AND asset file (' . $script_asset_path . ') found and loaded. Dependencies: ' . implode(', ', $script_asset['dependencies']) . ' | Version: ' . $script_asset['version'];
-		error_log($debug_message);
-		wp_die( esc_html( $debug_message ) );
+		// Removed wp_die for further debugging. Allowing enqueue functions to run.
+
+		// TEMP DEBUG: Override dependencies to test for issues with generated ones
+		$hardcoded_dependencies = ['wp-element', 'wp-i18n', 'wp-api-fetch', 'wp-components'];
+		error_log('[BricksLift A/B Debug] Original dependencies: ' . implode(', ', $script_asset['dependencies']));
+		error_log('[BricksLift A/B Debug] Using hardcoded dependencies: ' . implode(', ', $hardcoded_dependencies));
 
 
 		wp_enqueue_script(
 			self::ADMIN_SCRIPT_HANDLE,
 			$script_url,
-			$script_asset['dependencies'],
+			// $script_asset['dependencies'], // Use original dependencies
+			$hardcoded_dependencies, // Use hardcoded minimal dependencies for testing
 			$script_asset['version'],
 			true // Load in footer
 		);
-		error_log('[BricksLift A/B Debug] wp_enqueue_script called for ' . self::ADMIN_SCRIPT_HANDLE);
+		error_log('[BricksLift A/B Debug] wp_enqueue_script called for ' . self::ADMIN_SCRIPT_HANDLE . ' with ' . count($hardcoded_dependencies) . ' hardcoded dependencies.');
 
 		wp_enqueue_style(
 			self::ADMIN_SCRIPT_HANDLE . '-style', // Use a related handle for the style
 			$style_url,
-			[], // No specific style dependencies for now
+			[], // No specific style dependencies for now - assuming index.css has its imports or is self-contained
 			$script_asset['version'] // Use the same version for cache busting
 		);
 		error_log('[BricksLift A/B Debug] wp_enqueue_style called for ' . self::ADMIN_SCRIPT_HANDLE . '-style');
