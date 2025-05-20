@@ -132,6 +132,7 @@ class CPT_Manager {
 				'single'            => true,
 				'show_in_rest'      => true,
 				'sanitize_callback' => 'sanitize_textarea_field',
+				'default'           => '',
 			]
 		);
 
@@ -155,6 +156,7 @@ class CPT_Manager {
 						],
 					],
 				],
+				'default'           => '',
 			]
 		);
 
@@ -189,17 +191,33 @@ class CPT_Manager {
 		];
 
 		foreach ( $goal_specific_meta as $meta_key => $args ) {
-			register_post_meta(
-				self::CPT_SLUG,
-				$meta_key,
-				[
-					'type'              => $args['type'],
-					'description'       => __( $args['desc'], 'brickslift-ab-testing' ),
-					'single'            => true,
-					'show_in_rest'      => true,
-					'sanitize_callback' => $args['sanitize'],
-				]
-			);
+			$meta_args = [
+				'type'              => $args['type'],
+				'description'       => __( $args['desc'], 'brickslift-ab-testing' ),
+				'single'            => true,
+				'show_in_rest'      => true,
+				'sanitize_callback' => $args['sanitize'],
+			];
+
+			if ( isset( $args['default'] ) ) {
+				$meta_args['default'] = $args['default'];
+			} else {
+				switch ( $args['type'] ) {
+					case 'string':
+						$meta_args['default'] = '';
+						break;
+					case 'boolean':
+						$meta_args['default'] = false;
+						break;
+					case 'integer':
+						$meta_args['default'] = 0;
+						break;
+					case 'array':
+						$meta_args['default'] = [];
+						break;
+				}
+			}
+			register_post_meta( self::CPT_SLUG, $meta_key, $meta_args );
 		}
 
 		// Test Lifecycle Meta Fields
@@ -236,18 +254,24 @@ class CPT_Manager {
 		];
 
 		foreach ( $lifecycle_meta as $meta_key => $args ) {
-			register_post_meta(
-				self::CPT_SLUG,
-				$meta_key,
-				[
-					'type'              => $args['type'],
-					'description'       => __( $args['desc'], 'brickslift-ab-testing' ),
-					'single'            => true,
-					'show_in_rest'      => true,
-					'sanitize_callback' => $args['sanitize'],
-					'default'           => isset( $args['default'] ) ? $args['default'] : null,
-				]
-			);
+			$meta_args = [
+				'type'              => $args['type'],
+				'description'       => __( $args['desc'], 'brickslift-ab-testing' ),
+				'single'            => true,
+				'show_in_rest'      => true,
+				'sanitize_callback' => $args['sanitize'],
+			];
+
+			if ( isset( $args['default'] ) ) {
+				$meta_args['default'] = $args['default'];
+			} else {
+				// Apply default only if not set, primarily for string types in this array
+				// as others like 'boolean' (_blft_gdpr_consent_needed) already have defaults.
+				if ( $args['type'] === 'string' ) {
+					$meta_args['default'] = ''; // For _blft_test_end_date
+				}
+			}
+			register_post_meta( self::CPT_SLUG, $meta_key, $meta_args );
 		}
 
 
@@ -297,6 +321,7 @@ class CPT_Manager {
 				'single'            => true,
 				'show_in_rest'      => true,
 				'sanitize_callback' => 'sanitize_text_field',
+				'default'           => '',
 			]
 		);
 		register_post_meta(
@@ -308,6 +333,7 @@ class CPT_Manager {
 				'single'            => true,
 				'show_in_rest'      => true,
 				'sanitize_callback' => 'sanitize_text_field',
+				'default'           => '',
 			]
 		);
 	}

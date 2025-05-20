@@ -124,7 +124,16 @@ class Stats_Endpoint {
 		$stats_data = $this->db_manager->get_aggregated_stats( $test_id, $start_date, $end_date );
 
 		if ( is_wp_error( $stats_data ) ) {
-			return $stats_data; // Propagate WP_Error from DB_Manager.
+			// Log the detailed error for debugging if WP_DEBUG is on
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// error_log( 'BricksLift A/B Stats API DB Error: ' . $stats_data->get_error_message() );
+			}
+			// Return a generic error to the client
+			return new WP_Error(
+				'rest_db_error',
+				__( 'An error occurred while fetching statistics.', 'brickslift-ab-testing' ),
+				[ 'status' => 500 ]
+			);
 		}
 		
 		// Get variant names efficiently

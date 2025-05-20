@@ -9,6 +9,7 @@ namespace BricksLiftAB\API;
 
 use BricksLiftAB\API\Endpoints\Tests_Endpoint;
 use BricksLiftAB\API\Endpoints\Stats_Endpoint;
+use BricksLiftAB\API\Endpoints\Test_Stats_Daily_Endpoint;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -51,6 +52,7 @@ class REST_Controller {
 			new Tests_Endpoint(),
 			// Add other endpoint controllers here as they are created
 			new Stats_Endpoint(),
+			new Test_Stats_Daily_Endpoint(),
 		];
 	}
 }

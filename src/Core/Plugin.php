@@ -100,16 +100,11 @@ class Plugin {
 	 * Load required dependencies.
 	 */
 	private function load_dependencies() {
-		// Autoloader is handled by Composer.
-		require_once BLFT_PLUGIN_DIR . 'src/Core/CPT_Manager.php';
-		require_once BLFT_PLUGIN_DIR . 'src/Core/DB_Manager.php';
-		require_once BLFT_PLUGIN_DIR . 'src/Admin/Admin_Controller.php'; // Load Admin_Controller
-		require_once BLFT_PLUGIN_DIR . 'src/Admin/Assets_Manager.php';   // Load Assets_Manager
-		require_once BLFT_PLUGIN_DIR . 'src/API/REST_Controller.php';    // Load REST_Controller
-		require_once BLFT_PLUGIN_DIR . 'src/API/Endpoints/Tests_Endpoint.php'; // Load Tests_Endpoint
-		require_once BLFT_PLUGIN_DIR . 'src/Integrations/Bricks/Bricks_Integration_Loader.php'; // Load Bricks Integration
-		require_once BLFT_PLUGIN_DIR . 'src/Frontend/Frontend_Controller.php'; // Load Frontend_Controller
-		// Add other core dependencies here as needed.
+		// Autoloader is handled by Composer, so explicit require_once calls for classes
+		// within the BricksLiftAB namespace are generally not needed if files are correctly named and located.
+		// For example, `new CPT_Manager()` will be autoloaded from `src/Core/CPT_Manager.php`.
+		// If there were any non-namespaced procedural files or third-party libraries not managed by Composer,
+		// they would be required here.
 	}
 
 	/**
@@ -204,8 +199,14 @@ class Plugin {
 		$active_tests_query = new \WP_Query(
 			[
 				'post_type'      => CPT_Manager::CPT_SLUG,
-				'post_status'    => 'publish', // Assuming 'publish' is the active status.
-				'posts_per_page' => -1,         // Get all active tests.
+				'posts_per_page' => -1, // Get all active tests.
+				'meta_query'     => [
+					[
+						'key'     => '_blft_status',
+						'value'   => 'running',
+						'compare' => '=',
+					],
+				],
 				'fields'         => 'ids',      // Only get post IDs for efficiency.
 			]
 		);
@@ -279,12 +280,17 @@ class Plugin {
 
 			if ( $should_terminate ) {
 				// Update post status to 'completed'
-				wp_update_post(
-					[
-						'ID'          => $test_id,
-						'post_status' => 'completed',
-					]
-				);
+				// Update the custom status meta field to 'completed'
+				update_post_meta( $test_id, '_blft_status', 'completed' );
+
+				// Optionally, if you also want to change the WordPress post status, you can do it here.
+				// For example, to move it to a 'completed' CPT status if registered, or 'draft' etc.
+				// wp_update_post(
+				// 	[
+				// 		'ID'          => $test_id,
+				// 		'post_status' => 'completed', // This would be a custom registered post status
+				// 	]
+				// );
 				// error_log("BricksLift A/B Testing: Test ID {$test_id} status updated to completed.");
 
 				// Send admin notification

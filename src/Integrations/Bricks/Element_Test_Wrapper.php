@@ -145,6 +145,19 @@ class Element_Test_Wrapper extends \Bricks\Element {
 			return;
 		}
 
+		$test_variants_json = get_post_meta( $selected_test_id, '_blft_variants', true );
+		$test_variants      = ! empty( $test_variants_json ) ? json_decode( $test_variants_json, true ) : [];
+
+		if ( empty( $test_variants ) && bricks_is_builder_main() ) {
+			echo '<div class="blft-placeholder">' . esc_html__( 'The selected A/B Test has no variants defined. Please edit the test and add variants.', 'brickslift-ab-testing' ) . '</div>';
+			return;
+		}
+		if ( empty( $test_variants ) && ! bricks_is_builder_main() ) {
+			// No variants defined, and not in builder - render nothing or original content if applicable.
+			// For now, render nothing for this test container.
+			return;
+		}
+
 		// The main wrapper for the A/B test area
 		echo "<div {$this->render_attributes( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			'_root',
@@ -159,10 +172,22 @@ class Element_Test_Wrapper extends \Bricks\Element {
 		// Frontend JS will handle showing the correct one.
 		if ( ! empty( $this->children ) ) {
 			foreach ( $this->children as $index => $child_element ) {
-				// Assign a variant ID (e.g., based on order or a predefined ID from test settings later)
-				// For now, using index as a simple identifier. This needs to map to actual variant IDs from the test.
-				// This part will be refined when linking to actual variant data from the CPT.
-				$variant_identifier = 'variant-' . $index; // Placeholder
+				// Assign a variant ID based on the order of variants defined in the test settings.
+				$variant_identifier = null;
+				if ( isset( $test_variants[ $index ] ) && isset( $test_variants[ $index ]['id'] ) ) {
+					$variant_identifier = esc_attr( $test_variants[ $index ]['id'] );
+				} else {
+					// Fallback or error: Number of child elements might not match defined variants.
+					// In the builder, we might want to show a notice. On frontend, this variant might not be selectable.
+					if ( bricks_is_builder_main() ) {
+						echo '<div class="blft-placeholder" style="color: orange;">' . sprintf( esc_html__( 'Warning: Child element at index %d does not have a corresponding variant defined in test ID %d. This child will not be part of the A/B test.', 'brickslift-ab-testing' ), $index, $selected_test_id ) . '</div>';
+					}
+					// We still render the child but without a valid data-blft-variant-identifier it won't be picked by JS.
+					// Or, we could choose to not render it at all on the frontend if no matching variant ID.
+					// For now, render it but it won't be "active".
+					$child_element->render(); // Render without wrapper if no ID
+					continue; // Skip adding the variant wrapper for this child
+				}
 
 				echo "<div class=\"blft-variant-wrapper blft-variant-hidden\" data-blft-variant-identifier=\"{$variant_identifier}\">"; // All hidden by default
 				$child_element->render();

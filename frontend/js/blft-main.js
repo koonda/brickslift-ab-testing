@@ -9,7 +9,6 @@
 	const BLFT_VISITOR_HASH_KEY = 'blft_visitor_hash';
 	const BLFT_TEST_VARIANT_PREFIX = 'blft_test_variant_'; // test_id will be appended
 	const BLFT_IMPRESSION_TRACKED_PREFIX = 'blft_impression_tracked_'; // test_id + variant_id will be appended
-	const BLFT_VIEW_TRACKED_PREFIX = 'blft_view_tracked_'; // test_id + variant_id will be appended
 	const BLFT_CONVERSION_TRACKED_SESSION_PREFIX = 'blft_conv_tracked_session_'; // testId_goalType will be appended
 
 	// Object to store flags for conversions tracked in the current page view for certain goal types
@@ -138,7 +137,6 @@
 						wrapper.classList.add('blft-variant-visible');
 						variantShown = true;
 						trackImpression(testId, selectedVariantId, visitorHash);
-						sendTrackViewRequest(testId, selectedVariantId);
 					} else {
 						wrapper.classList.remove('blft-variant-visible');
 						wrapper.classList.add('blft-variant-hidden'); // Ensure others are hidden
@@ -154,7 +152,6 @@
 			                 if (fallbackVariantId) {
 			                     localStorage.setItem(BLFT_TEST_VARIANT_PREFIX + testId, fallbackVariantId);
 			                     trackImpression(testId, fallbackVariantId, visitorHash);
-			                     sendTrackViewRequest(testId, fallbackVariantId);
 			                    }
 			                   }
 
@@ -167,7 +164,6 @@
 			             if (fallbackVariantId) {
 			                  localStorage.setItem(BLFT_TEST_VARIANT_PREFIX + testId, fallbackVariantId); // Store the fallback
 			                  trackImpression(testId, fallbackVariantId, visitorHash);
-			                  sendTrackViewRequest(testId, fallbackVariantId);
 			                }
 			               }
                  });
@@ -224,64 +220,16 @@
   }
  
   /**
-   * Sends an AJAX request to track a variant view and set a cookie.
-   * Ensures the request is sent only once per session for a specific test variant.
-   * @param {string} testId
-   * @param {string} variantId
-   */
-  function sendTrackViewRequest(testId, variantId) {
-  	if (!BricksLiftAB_FrontendData || !BricksLiftAB_FrontendData.track_view_nonce || !BricksLiftAB_FrontendData.ajax_url) {
-  		// console.error('BricksLift A/B FrontendData not available for view tracking.');
-  		return;
-  	}
- 
-  	const sessionTrackKey = `${BLFT_VIEW_TRACKED_PREFIX}${testId}_${variantId}`;
- 
-  	if (sessionStorage.getItem(sessionTrackKey)) {
-  		// console.log(`View for test ${testId}, variant ${variantId} already tracked this session.`);
-  		return;
-  	}
- 
-  	if (!checkGDPRConsent(testId)) {
-  		// console.log(`GDPR consent not met for test ${testId}. View not tracked.`);
-  		return;
-  	}
- 
-  	const formData = new FormData();
-  	formData.append('action', 'blft_track_view');
-  	formData.append('nonce', BricksLiftAB_FrontendData.track_view_nonce);
-  	formData.append('test_id', testId);
-  	formData.append('variant_id', variantId);
- 
-  	fetch(BricksLiftAB_FrontendData.ajax_url, {
-  		method: 'POST',
-  		body: formData,
-  	})
-  	.then(response => response.json())
-  	.then(data => {
-  		if (data.success) {
-  			sessionStorage.setItem(sessionTrackKey, 'true');
-  			// console.log(`View tracked for test ${testId}, variant ${variantId}. Cookie attempt: ${data.data.cookie_set}`);
-  		} else {
-  			// console.error('Failed to track view:', data.data ? data.data.message : 'Unknown error');
-  		}
-  	})
-  	.catch(error => {
-  		// console.error('Error sending view tracking request:', error);
-  	});
-  }
- 
-  /**
   * Checks GDPR consent for a specific test.
   * @param {string} testId The ID of the test.
   * @returns {boolean} True if consent is met or not required, false otherwise.
   */
  function checkGDPRConsent(testId) {
  	if (!BricksLiftAB_FrontendData || !BricksLiftAB_FrontendData.active_tests || !BricksLiftAB_FrontendData.active_tests[testId]) {
- 		// console.warn(`GDPR settings not found for test ${testId}. Assuming consent not required.`);
- 		return true; // Default to true if settings are missing, to not break tracking entirely. Consider a stricter default.
+ 		// console.warn(`GDPR settings not found for test ${testId}. Assuming consent NOT met if settings are missing.`);
+ 		return false; // Default to false (consent not met) if settings are missing.
  	}
-
+ 
  	const testSettings = BricksLiftAB_FrontendData.active_tests[testId];
  	const gdpr = testSettings.gdpr_settings;
 

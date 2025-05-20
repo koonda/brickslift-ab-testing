@@ -4,13 +4,14 @@
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
+import { Button } from '@wordpress/components'; // Import Button
 
 /**
  * Internal dependencies
  */
 import './Dashboard.scss'; // We'll create this for styling
 
-const Dashboard = ({ onEditTest }) => { // Added onEditTest prop
+const Dashboard = ({ onEditTest, onViewStats }) => { // Added onViewStats prop
 	const [tests, setTests] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -69,10 +70,20 @@ const Dashboard = ({ onEditTest }) => { // Added onEditTest prop
 							<td>{test.blft_status || __('N/A', 'brickslift-ab-testing')}</td>
 							<td>{test.date_created ? new Date(test.date_created).toLocaleDateString() : __('N/A', 'brickslift-ab-testing')}</td>
 							<td>
-								<Button variant="secondary" onClick={() => onEditTest ? onEditTest(test.id) : null}>
+								<Button
+									variant="secondary"
+									onClick={() => onEditTest ? onEditTest(test.id) : null}
+									style={{ marginRight: '8px' }}
+								>
 									{__('Edit', 'brickslift-ab-testing')}
 								</Button>
-								{/* Add other actions like "View Stats", "Pause", "Delete" later */}
+								<Button
+									variant="secondary"
+									onClick={() => onViewStats ? onViewStats(test.id) : null}
+								>
+									{__('View Stats', 'brickslift-ab-testing')}
+								</Button>
+								{/* Add other actions like "Pause", "Delete" later */}
 							</td>
 						</tr>
 					))}
