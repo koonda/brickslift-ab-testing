@@ -8,6 +8,7 @@
 namespace BricksLiftAB\API\Endpoints;
 
 use WP_Error;
+use WP_REST_Controller; // Added this line
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -24,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Handles the /test-stats-daily endpoint.
  */
-class Test_Stats_Daily_Endpoint {
+class Test_Stats_Daily_Endpoint extends WP_REST_Controller {
 
 	/**
 	 * The namespace for the REST API.
@@ -51,6 +52,9 @@ class Test_Stats_Daily_Endpoint {
 	 * Constructor.
 	 */
 	public function __construct() {
+		parent::__construct(); // Call parent constructor
+		$this->namespace = 'blft/v1'; // Ensure namespace is set before parent constructor or route registration
+		$this->rest_base = 'test-stats-daily'; // Ensure rest_base is set
 		$this->db_manager = new DB_Manager();
 	}
 
