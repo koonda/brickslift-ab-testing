@@ -21,24 +21,17 @@ class Assets_Manager {
 
 	const ADMIN_SCRIPT_HANDLE = 'blft-admin-app';
 
-	private $page_slugs;
 	private $target_hook_suffix;
 
 	/**
 	 * Constructor.
+	 *
+	 * @param string $dashboard_hook_suffix The correct hook suffix for the dashboard page.
 	 */
-	public function __construct() {
-		$this->page_slugs = [
-			'dashboard' => 'brickslift-ab-dashboard',
-			// Add other page slugs here if needed, e.g., 'settings' => 'brickslift-ab-settings'
-		];
+	public function __construct( string $dashboard_hook_suffix ) {
+		$this->target_hook_suffix = $dashboard_hook_suffix;
 
-		// Construct the target hook suffix once in the constructor.
-		// The parent slug for a CPT submenu page is the CPT slug itself.
-		$this->target_hook_suffix = get_plugin_page_hookname( $this->page_slugs['dashboard'], \BricksLiftAB\Core\CPT_Manager::CPT_SLUG );
-
-		error_log('[BricksLift A/B Debug] Assets_Manager constructed. Target hook suffix set to: ' . $this->target_hook_suffix);
-		error_log('[BricksLift A/B Debug] Page slugs for target_hook_suffix: ' . print_r($this->page_slugs, true));
+		error_log('[BricksLift A/B Debug] Assets_Manager constructed. Target hook suffix received: ' . $this->target_hook_suffix);
 
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
 	}
