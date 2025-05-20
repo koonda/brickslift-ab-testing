@@ -20,16 +20,25 @@ const Dashboard = ({ onEditTest, onViewStats }) => { // Added onViewStats prop
 		setIsLoading(true);
 		setError(null);
 
+		// eslint-disable-next-line no-console
+		console.log('BricksLift A/B Dashboard: useEffect triggered. BricksLiftAB_AdminData:', window.BricksLiftAB_AdminData);
+
+		// eslint-disable-next-line no-console
+		console.log('BricksLift A/B Dashboard: Attempting to fetch tests...');
 		apiFetch({ path: '/blft/v1/tests' })
 			.then((fetchedTests) => {
+				// eslint-disable-next-line no-console
+				console.log('BricksLift A/B Dashboard: Successfully fetched tests:', fetchedTests);
 				setTests(fetchedTests);
 				setIsLoading(false);
 			})
 			.catch((fetchError) => {
+				// eslint-disable-next-line no-console
+				console.error('BricksLift A/B Dashboard: Error fetching tests (inside catch):', fetchError);
 				setError(fetchError.message || __('Failed to load tests.', 'brickslift-ab-testing'));
 				setIsLoading(false);
 				// eslint-disable-next-line no-console
-				console.error('Error fetching tests:', fetchError);
+				console.error('Error fetching tests:', fetchError); // Original console.error
 			});
 	}, []);
 
