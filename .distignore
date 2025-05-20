@@ -1,0 +1,41 @@
+# WordPress & Plugin specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node.js / npm / yarn
+admin-ui/node_modules/
+admin-ui/package-lock.json
+# admin-ui/package.json # Keep if needed by the plugin at runtime, otherwise ignore
+# admin-ui/webpack.config.js # Development only
+
+# Source files (if only build is needed)
+admin-ui/src/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE / Editor specific
+.vscode/
+.idea/
+
+# Build artifacts from other processes (if any)
+# build/
+# dist/
+
+# Test files
+# tests/
+# *.test.js
+# *.spec.js
+
+# Documentation / Dev notes (if not for users)
+# docs/
+# *.md
+
+# Other development files
+admin-ui/.eslint*
+admin-ui/.prettier*
+admin-ui/postcss.config.js
+# Add any other development-specific files or folders

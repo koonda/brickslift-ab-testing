@@ -1,0 +1,43 @@
+/**
+ * BricksLift A/B Testing - Frontend Styles
+ */
+
+/*
+ * Default state for variant wrappers: hidden.
+ * This is applied by the Bricks element's render method initially.
+ * The `!important` helps ensure this style takes precedence during initial load
+ * before JavaScript has a chance to run and potentially override it.
+ * However, use !important sparingly. The JS will explicitly manage visibility.
+ */
+.blft-variant-hidden {
+	display: none !important; /* Hide by default to prevent flicker */
+}
+
+/*
+ * State for the selected, visible variant.
+ * JavaScript will add this class to the chosen variant.
+ */
+.blft-variant-visible {
+	display: block !important; /* Ensure the selected variant is displayed */
+}
+
+/*
+ * Optional: Styles for the main test container if needed.
+ */
+.blft-test-container {
+	/* Add any specific container styles here */
+	/* For example, to ensure it doesn't collapse if all children are hidden initially: */
+	/* min-height: 1px; */
+}
+
+/*
+ * Placeholder styles for the builder view (if needed)
+ * These are typically shown only within the Bricks editor.
+ */
+.blft-placeholder {
+	padding: 20px;
+	background-color: #f0f0f1;
+	border: 1px dashed #c3c4c7;
+	text-align: center;
+	color: #50575e;
+}

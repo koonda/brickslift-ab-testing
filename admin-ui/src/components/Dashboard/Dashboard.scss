@@ -1,0 +1,20 @@
+/**
+ * Styles for BricksLift A/B Testing Dashboard component
+ */
+
+.blft-dashboard {
+	h2 {
+		margin-bottom: 1em;
+	}
+
+	// Using WordPress default table styles by applying classes like:
+	// .wp-list-table .widefat .fixed .striped
+	// No extensive custom styles needed here if we leverage WP core styles.
+
+	// Example of a custom style if needed:
+	// table {
+	//   th {
+	//     font-weight: bold;
+	//   }
+	// }
+}

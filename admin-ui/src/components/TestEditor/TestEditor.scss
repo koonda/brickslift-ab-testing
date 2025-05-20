@@ -1,0 +1,57 @@
+/**
+ * Styles for BricksLift A/B Testing TestEditor component
+ */
+
+.blft-test-editor {
+	.notice {
+		margin-bottom: 1em;
+	}
+
+	.components-panel__body {
+		margin-bottom: 1em;
+
+		.components-panel__row {
+			// Allow components to take more width if needed
+			// display: flex;
+			// flex-direction: column; // Stack label and control
+
+			// > .components-base-control {
+			// 	width: 100%;
+			// }
+		}
+	}
+
+	.blft-variant-row {
+		display: flex;
+		align-items: flex-end; // Align items to the bottom for better layout with buttons
+		gap: 10px; // Space between elements
+		margin-bottom: 10px;
+		padding-bottom: 10px;
+		border-bottom: 1px solid #e0e0e0;
+
+		&:last-child {
+			border-bottom: none;
+			margin-bottom: 0;
+			padding-bottom: 0;
+		}
+
+		.blft-variant-name {
+			flex-grow: 1; // Name takes up available space
+		}
+
+		.blft-variant-distribution {
+			width: 120px; // Fixed width for distribution input
+			flex-shrink: 0;
+		}
+
+		.components-button.is-destructive {
+			// Adjust alignment or margin if needed
+		}
+	}
+
+	.blft-editor-actions {
+		margin-top: 20px;
+		padding-top: 20px;
+		border-top: 1px solid #ddd;
+	}
+}

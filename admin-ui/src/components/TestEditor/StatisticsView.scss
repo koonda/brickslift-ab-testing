@@ -1,0 +1,58 @@
+/*
+ * Styles for the StatisticsView component.
+ */
+
+.blft-statistics-view {
+  padding: 20px;
+
+  .blft-period-selector {
+    margin-bottom: 20px;
+
+    label {
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    select {
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+  }
+
+  .blft-statistics-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f9f9f9;
+      font-weight: bold;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+  }
+
+  .blft-loading,
+  .blft-error,
+  .blft-no-data {
+    padding: 20px;
+    text-align: center;
+    font-style: italic;
+    color: #777;
+  }
+
+  .blft-error {
+    color: red;
+    font-weight: bold;
+  }
+}

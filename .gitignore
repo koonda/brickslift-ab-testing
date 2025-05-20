@@ -1,0 +1,28 @@
+# PHP Composer dependencies
+vendor/
+
+# Node.js dependencies
+node_modules/
+admin-ui/node_modules/
+
+# Compiled/build artifacts
+admin-ui/build/
+
+# IDE configuration folders
+.vscode/
+.idea/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Log files
+*.log
+
+# Local environment files
+.env
+
+# Temporary archive files
+# Be mindful if you create local release zips with this pattern
+*.zip
