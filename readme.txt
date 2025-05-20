@@ -5,7 +5,7 @@ Tags: bricks, bricksbuilder, a/b testing, split testing, conversion optimization
 Requires at least: 5.8
 Tested up to: (latest WordPress version)
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,8 @@ Provides an intuitive and powerful tool for A/B testing elements, sections, and 
 1. Description of the first screenshot.
 
 == Changelog ==
+== 0.2.0 ==
+- Updated plugin version to 0.2.0.
 
 = 0.1.0 =
 * Initial release.
