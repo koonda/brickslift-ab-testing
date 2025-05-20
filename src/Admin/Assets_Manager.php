@@ -43,21 +43,38 @@ class Assets_Manager {
 		// And for the CPT's add new page: 'post-new.php?post_type=blft_test' -> 'post-new-blft_test'
 		// We only want to load assets on our custom dashboard page.
 		$target_hook = \BricksLiftAB\Core\CPT_Manager::CPT_SLUG . '_page_brickslift-ab-dashboard';
+
+		// Debugging: Log hook suffix and target hook
+		error_log('[BricksLift A/B Debug] enqueue_admin_assets called. Hook suffix: ' . $hook_suffix . ' | Target hook: ' . $target_hook);
+
 		if ( $target_hook !== $hook_suffix ) {
+			error_log('[BricksLift A/B Debug] Hooks do not match. Assets not enqueued for ' . $hook_suffix);
 			return;
 		}
+		error_log('[BricksLift A/B Debug] Hooks matched! Proceeding to enqueue assets for ' . $hook_suffix);
 
 		$script_asset_path = BLFT_PLUGIN_DIR . 'admin-ui/build/index.asset.php';
 		$script_url        = BLFT_PLUGIN_URL . 'admin-ui/build/index.js';
 		$style_url         = BLFT_PLUGIN_URL . 'admin-ui/build/index.css';
 
+		// Restore file_exists check
 		if ( ! file_exists( $script_asset_path ) ) {
 			// translators: %s: path to the asset file.
-			wp_die( esc_html( sprintf( __( 'BricksLift A/B Testing: You need to build the admin assets. Run "npm install && npm run build" in the %s directory.', 'brickslift-ab-testing' ), 'admin-ui' ) ) );
-			return;
+			$error_message = sprintf( __( 'BricksLift A/B Testing: Admin asset file not found: %s. Path checked: %s. Please ensure assets are built and deployed correctly.', 'brickslift-ab-testing' ), basename($script_asset_path), $script_asset_path );
+			error_log('[BricksLift A/B Debug] FATAL: ' . $error_message);
+			wp_die( esc_html( $error_message ) );
+			return; // Should be redundant due to wp_die
 		}
+		error_log('[BricksLift A/B Debug] file_exists check for ' . $script_asset_path . ' PASSED.');
 
 		$script_asset = require $script_asset_path;
+		error_log('[BricksLift A/B Debug] Script asset path loaded: ' . $script_asset_path);
+
+		// Debugging: Halt if hook matches and asset file is found and loaded
+		$debug_message = '[BricksLift A/B Debug] HALTING EXECUTION: Hook (' . $hook_suffix . ') matched AND asset file (' . $script_asset_path . ') found and loaded. Dependencies: ' . implode(', ', $script_asset['dependencies']) . ' | Version: ' . $script_asset['version'];
+		error_log($debug_message);
+		wp_die( esc_html( $debug_message ) );
+
 
 		wp_enqueue_script(
 			self::ADMIN_SCRIPT_HANDLE,
@@ -66,6 +83,7 @@ class Assets_Manager {
 			$script_asset['version'],
 			true // Load in footer
 		);
+		error_log('[BricksLift A/B Debug] wp_enqueue_script called for ' . self::ADMIN_SCRIPT_HANDLE);
 
 		wp_enqueue_style(
 			self::ADMIN_SCRIPT_HANDLE . '-style', // Use a related handle for the style
@@ -73,6 +91,7 @@ class Assets_Manager {
 			[], // No specific style dependencies for now
 			$script_asset['version'] // Use the same version for cache busting
 		);
+		error_log('[BricksLift A/B Debug] wp_enqueue_style called for ' . self::ADMIN_SCRIPT_HANDLE . '-style');
 
 		// Pass data to script if needed, e.g., REST API nonce, base URL.
 		wp_localize_script(
@@ -84,5 +103,6 @@ class Assets_Manager {
 				// Add other data as needed
 			]
 		);
+		error_log('[BricksLift A/B Debug] wp_localize_script called for BricksLiftAB_AdminData.');
 	}
 }

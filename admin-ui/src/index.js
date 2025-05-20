@@ -1,3 +1,6 @@
+// eslint-disable-next-line no-console
+console.log('[BricksLift A/B Debug] admin-ui/src/index.js parsing started.');
+
 /**
  * WordPress dependencies
  */
