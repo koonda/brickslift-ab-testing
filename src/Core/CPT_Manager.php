@@ -104,6 +104,19 @@ class CPT_Manager {
 				'label_count'               => _n_noop( 'Completed <span class="count">(%s)</span>', 'Completed <span class="count">(%s)</span>', 'brickslift-ab-testing' ),
 			]
 		);
+
+		register_post_status(
+			'archived',
+			[
+				'label'                     => _x( 'Archived', 'post status', 'brickslift-ab-testing' ),
+				'public'                    => false, // Not public in the same way 'publish' is
+				'internal'                  => true,  // For internal use, not shown in frontend queries by default
+				'exclude_from_search'       => true,
+				'show_in_admin_all_list'    => true, // Show in "All" filter
+				'show_in_admin_status_list' => true, // Show in the dropdown of statuses
+				'label_count'               => _n_noop( 'Archived <span class="count">(%s)</span>', 'Archived <span class="count">(%s)</span>', 'brickslift-ab-testing' ),
+			]
+		);
 	}
 
 	/**
@@ -115,7 +128,7 @@ class CPT_Manager {
 			'_blft_status',
 			[
 				'type'              => 'string',
-				'description'       => __( 'Status of the A/B test (draft, running, paused, completed).', 'brickslift-ab-testing' ),
+				'description'       => __( 'Status of the A/B test (draft, running, paused, completed, archived).', 'brickslift-ab-testing' ),
 				'single'            => true,
 				'show_in_rest'      => true,
 				'default'           => 'draft',
@@ -133,6 +146,45 @@ class CPT_Manager {
 				'show_in_rest'      => true,
 				'sanitize_callback' => 'sanitize_textarea_field',
 				'default'           => '',
+			]
+		);
+
+		register_post_meta(
+			self::CPT_SLUG,
+			'_blft_start_date',
+			[
+				'type'              => 'string',
+				'description'       => __( 'Start date of the A/B test (YYYY-MM-DD).', 'brickslift-ab-testing' ),
+				'single'            => true,
+				'show_in_rest'      => true,
+				'default'           => '',
+				'sanitize_callback' => 'sanitize_text_field',
+			]
+		);
+
+		register_post_meta(
+			self::CPT_SLUG,
+			'_blft_hypothesis',
+			[
+				'type'              => 'string',
+				'description'       => __( 'Hypothesis for the A/B test.', 'brickslift-ab-testing' ),
+				'single'            => true,
+				'show_in_rest'      => true,
+				'default'           => '',
+				'sanitize_callback' => 'sanitize_textarea_field',
+			]
+		);
+
+		register_post_meta(
+			self::CPT_SLUG,
+			'_blft_winner_variant_id',
+			[
+				'type'              => 'string',
+				'description'       => __( 'ID of the winning variant.', 'brickslift-ab-testing' ),
+				'single'            => true,
+				'show_in_rest'      => true,
+				'default'           => '',
+				'sanitize_callback' => 'sanitize_text_field',
 			]
 		);
 
@@ -156,7 +208,7 @@ class CPT_Manager {
 						],
 					],
 				],
-				'default'           => '',
+				'default'           => '[]',
 			]
 		);
 
