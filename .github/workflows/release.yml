@@ -1,0 +1,117 @@
+name: Create Plugin Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on tags like v1.0.0, v1.2.3
+
+jobs:
+  build-release:
+    name: Build and Release Plugin
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to create releases and upload assets
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0' # Appropriate for the plugin
+          extensions: mbstring, zip # Common extensions, zip for archiving
+          coverage: none # No code coverage needed for release build
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
+        # This creates the vendor/ directory with only production dependencies
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x' # Appropriate for admin-ui
+          cache: 'npm'
+          cache-dependency-path: admin-ui/package-lock.json # Path to npm lock file
+
+      - name: Install admin-ui npm dependencies
+        working-directory: ./admin-ui
+        run: npm ci
+        # 'npm ci' is used for faster, more reliable builds in CI environments
+
+      - name: Build admin-ui
+        working-directory: ./admin-ui
+        run: npm run build
+        # This command should generate the admin-ui/build/ directory
+
+      - name: Prepare release archive name
+        id: release_vars
+        run: echo "zip_name=brickslift-ab-testing-${{ github.ref_name }}.zip" >> $GITHUB_OUTPUT
+        # Sets an output variable for the zip file name
+
+      - name: Create plugin .zip archive
+        run: |
+          zip -r ${{ steps.release_vars.outputs.zip_name }} \
+            brickslift-ab-testing.php \
+            composer.json \
+            frontend \
+            languages \
+            readme.txt \
+            src \
+            uninstall.php \
+            vendor \
+            admin-ui/build \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x ".gitignore" \
+            -x ".gitattributes" \
+            -x "node_modules/*" \
+            -x "package.json" \
+            -x "package-lock.json" \
+            -x "admin-ui/node_modules/*" \
+            -x "admin-ui/src/*" \
+            -x "admin-ui/package.json" \
+            -x "admin-ui/package-lock.json" \
+            -x "admin-ui/webpack.config.js" \
+            -x "admin-ui/postcss.config.js" \
+            -x "admin-ui/.eslint*" \
+            -x "admin-ui/.prettier*" \
+            -x "composer.lock" \
+            -x ".DS_Store" \
+            -x "Thumbs.db" \
+            -x "desktop.ini" \
+            -x ".vscode/*" \
+            -x ".idea/*" \
+            -x "*.log" \
+            -x "phpcs.xml.dist" \
+            -x "phpunit.xml.dist" \
+            -x ".travis.yml" \
+            -x ".distignore" \
+            -x "tar-excludes.txt" \
+            -x "documentation.md" \
+            -x "tests/*" \
+            -x "*.test.js" \
+            -x "*.spec.js"
+        # This command packages the essential plugin files and excludes development/unnecessary files.
+        # The archive includes: main plugin file, composer.json (for reference), frontend assets,
+        # languages, readme, src code, uninstall script, PHP vendor dependencies, and the admin UI build.
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by GitHub Actions
+        with:
+          tag_name: ${{ github.ref_name }} # Use the tag that triggered the workflow
+          name: Release ${{ github.ref_name }} # Name of the release
+          body: |
+            Automated release for ${{ github.ref_name }}.
+            Plugin files are attached.
+            <!-- Add link to changelog or detailed release notes here if available -->
+          draft: false # Set to true to create a draft release
+          prerelease: false # Set to true if this is a pre-release
+          files: ${{ steps.release_vars.outputs.zip_name }} # Path to the release asset (the .zip file)
+
+      - name: Output Release URL
+        run: echo "Release URL: ${{ steps.create_release.outputs.html_url }}"
+        # Displays the URL of the created release in the workflow log
