@@ -3,7 +3,7 @@
  * Plugin Name: BricksLift A/B Testing
  * Plugin URI: https://brickslift.com/
  * Description: A/B testing for Bricks Builder.
- * Version: 0.5.3
+ * Version: 0.5.4
  * Author: Adam Kotala
  * Author URI: https://digistorm.cz
  * License: GPLv2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
-define( 'BLFT_VERSION', '0.5.3' );
+define( 'BLFT_VERSION', '0.5.4' );
 define( 'BLFT_PLUGIN_FILE', __FILE__ );
 define( 'BLFT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BLFT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -153,14 +153,20 @@ add_action( 'admin_footer', function() {
 // --- Start of Fix: Manually call wp_print_footer_scripts ---
 
 // Manually call wp_print_footer_scripts because it seems to be unhooked
+// --- Start of Fix: Capture and Echo wp_print_footer_scripts Output ---
+
+// Manually call wp_print_footer_scripts and capture its output
 add_action( 'admin_footer', function() {
-    error_log( '[BricksLift A/B Debug] Manually calling wp_print_footer_scripts().' );
-    wp_print_footer_scripts();
-    error_log( '[BricksLift A/B Debug] Manual call to wp_print_footer_scripts() finished.' );
-// --- Add this line ---
-    ob_end_flush();
-    // --- End of added line ---
-}, 99 ); // Use a high priority to run after most other hooks, but before our very late debug log (99999)
+    error_log( '[BricksLift A/B Debug] Starting output capture for wp_print_footer_scripts().' );
+    ob_start(); // Start output buffering
+    wp_print_footer_scripts(); // This function outputs to the buffer
+    $script_output = ob_get_clean(); // Capture buffer content and clean buffer
+    error_log( '[BricksLift A/B Debug] Output capture finished. Captured ' . strlen($script_output) . ' bytes.' );
+    echo $script_output; // Explicitly echo the captured output
+    error_log( '[BricksLift A/B Debug] Captured output echoed.' );
+}, 99 ); // Use a high priority
+
+// --- End of Fix: Capture and Echo wp_print_footer_scripts Output ---
 // Note: The existing debug hooks (priority 1, 19, 21, 9999, 99999) should remain for now to confirm execution flow.
 
 // --- End of Fix: Manually call wp_print_footer_scripts ---
