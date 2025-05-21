@@ -3,7 +3,7 @@
  * Plugin Name: BricksLift A/B Testing
  * Plugin URI: https://brickslift.com/
  * Description: A/B testing for Bricks Builder.
- * Version: 0.5.0
+ * Version: 0.5.1
  * Author: Adam Kotala
  * Author URI: https://digistorm.cz
  * License: GPLv2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
-define( 'BLFT_VERSION', '0.5.0' );
+define( 'BLFT_VERSION', '0.5.1' );
 define( 'BLFT_PLUGIN_FILE', __FILE__ );
 define( 'BLFT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BLFT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -90,3 +90,63 @@ add_action( 'admin_print_footer_scripts', function() {
     }
     // Optional: error_log( '[BricksLift A/B Debug] $wp_scripts->queue: ' . print_r( $wp_scripts->queue, true ) );
 }, 9999 ); // High priority to run late
+// --- Start of New Debug Snippets for admin_footer ---
+
+// Check if admin_footer action starts
+add_action( 'admin_footer', function() {
+    error_log( '[BricksLift A/B Debug] admin_footer action STARTED (priority 1 hook).' );
+
+    // Check if wp_print_footer_scripts is hooked to admin_footer
+    global $wp_filter;
+    $hook_name = 'admin_footer';
+    $priority_to_check = 20; // Default priority for wp_print_footer_scripts
+    $function_to_check = 'wp_print_footer_scripts';
+    $is_hooked = false;
+
+    if ( isset( $wp_filter[ $hook_name ] ) && isset( $wp_filter[ $hook_name ]->callbacks[ $priority_to_check ] ) ) {
+        foreach ( $wp_filter[ $hook_name ]->callbacks[ $priority_to_check ] as $callback ) {
+            if ( isset( $callback['function'] ) && $callback['function'] === $function_to_check ) {
+                $is_hooked = true;
+                break;
+            }
+        }
+    }
+    if ( $is_hooked ) {
+        error_log( '[BricksLift A/B Debug] wp_print_footer_scripts IS HOOKED to admin_footer at priority ' . $priority_to_check . '.' );
+    } else {
+        error_log( '[BricksLift A/B Debug] wp_print_footer_scripts IS NOT HOOKED to admin_footer at default priority ' . $priority_to_check . '. Checking other priorities...' );
+        $found_at_other_priority = false;
+        if (isset($wp_filter[$hook_name])) {
+            foreach ($wp_filter[$hook_name]->callbacks as $priority => $callbacks_at_priority) {
+                foreach ($callbacks_at_priority as $callback_details) {
+                    if (isset($callback_details['function']) && $callback_details['function'] === $function_to_check) {
+                        error_log('[BricksLift A/B Debug] Found wp_print_footer_scripts hooked at priority: ' . $priority);
+                        $found_at_other_priority = true;
+                        break 2; // Break both loops
+                    }
+                }
+            }
+        }
+        if (!$found_at_other_priority) {
+             error_log('[BricksLift A/B Debug] wp_print_footer_scripts NOT FOUND on admin_footer at any priority.');
+        }
+    }
+
+}, 1 ); // Run very early
+
+// Check just before wp_print_footer_scripts (default priority 20)
+add_action( 'admin_footer', function() {
+    error_log( '[BricksLift A/B Debug] admin_footer hook: Just BEFORE wp_print_footer_scripts should run (priority 19 check).' );
+}, 19 );
+
+// Check just after wp_print_footer_scripts (default priority 20)
+add_action( 'admin_footer', function() {
+    error_log( '[BricksLift A/B Debug] admin_footer hook: Just AFTER wp_print_footer_scripts should have run (priority 21 check).' );
+}, 21 );
+
+// Check if admin_footer action ends (very late)
+add_action( 'admin_footer', function() {
+    error_log( '[BricksLift A/B Debug] admin_footer action ENDED (priority 99999 hook).' );
+}, 99999 ); // Run very late
+
+// --- End of New Debug Snippets for admin_footer ---
