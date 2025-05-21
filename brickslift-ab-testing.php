@@ -3,7 +3,7 @@
  * Plugin Name: BricksLift A/B Testing
  * Plugin URI: https://brickslift.com/
  * Description: A/B testing for Bricks Builder.
- * Version: 0.5.1
+ * Version: 0.5.2
  * Author: Adam Kotala
  * Author URI: https://digistorm.cz
  * License: GPLv2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
-define( 'BLFT_VERSION', '0.5.1' );
+define( 'BLFT_VERSION', '0.5.2' );
 define( 'BLFT_PLUGIN_FILE', __FILE__ );
 define( 'BLFT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BLFT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -150,3 +150,14 @@ add_action( 'admin_footer', function() {
 }, 99999 ); // Run very late
 
 // --- End of New Debug Snippets for admin_footer ---
+// --- Start of Fix: Manually call wp_print_footer_scripts ---
+
+// Manually call wp_print_footer_scripts because it seems to be unhooked
+add_action( 'admin_footer', function() {
+    error_log( '[BricksLift A/B Debug] Manually calling wp_print_footer_scripts().' );
+    wp_print_footer_scripts();
+    error_log( '[BricksLift A/B Debug] Manual call to wp_print_footer_scripts() finished.' );
+}, 99 ); // Use a high priority to run after most other hooks, but before our very late debug log (99999)
+// Note: The existing debug hooks (priority 1, 19, 21, 9999, 99999) should remain for now to confirm execution flow.
+
+// --- End of Fix: Manually call wp_print_footer_scripts ---
