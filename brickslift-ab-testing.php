@@ -3,7 +3,7 @@
  * Plugin Name: BricksLift A/B Testing
  * Plugin URI: https://brickslift.com/
  * Description: A/B testing for Bricks Builder.
- * Version: 0.5.2
+ * Version: 0.5.3
  * Author: Adam Kotala
  * Author URI: https://digistorm.cz
  * License: GPLv2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
-define( 'BLFT_VERSION', '0.5.2' );
+define( 'BLFT_VERSION', '0.5.3' );
 define( 'BLFT_PLUGIN_FILE', __FILE__ );
 define( 'BLFT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BLFT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -157,7 +157,33 @@ add_action( 'admin_footer', function() {
     error_log( '[BricksLift A/B Debug] Manually calling wp_print_footer_scripts().' );
     wp_print_footer_scripts();
     error_log( '[BricksLift A/B Debug] Manual call to wp_print_footer_scripts() finished.' );
+// --- Add this line ---
+    ob_end_flush();
+    // --- End of added line ---
 }, 99 ); // Use a high priority to run after most other hooks, but before our very late debug log (99999)
 // Note: The existing debug hooks (priority 1, 19, 21, 9999, 99999) should remain for now to confirm execution flow.
 
 // --- End of Fix: Manually call wp_print_footer_scripts ---
+// --- Start of New Debug Snippets for Output Buffering ---
+
+// Check output buffering state very early in admin_footer
+add_action( 'admin_footer', function() {
+    error_log( '[BricksLift A/B Debug] OB Check (Priority 5): Level=' . ob_get_level() . ', Length=' . ob_get_length() );
+}, 5 );
+
+// Check output buffering state just before our manual wp_print_footer_scripts call (priority 99)
+add_action( 'admin_footer', function() {
+    error_log( '[BricksLift A/B Debug] OB Check (Priority 98): Level=' . ob_get_level() . ', Length=' . ob_get_length() );
+}, 98 ); // Priority 98 is just before our manual call at 99
+
+// Check output buffering state just after our manual wp_print_footer_scripts call (priority 99)
+add_action( 'admin_footer', function() {
+    error_log( '[BricksLift A/B Debug] OB Check (Priority 100): Level=' . ob_get_level() . ', Length=' . ob_get_length() );
+}, 100 ); // Priority 100 is just after our manual call at 99
+
+// Check output buffering state very late in admin_footer
+add_action( 'admin_footer', function() {
+    error_log( '[BricksLift A/B Debug] OB Check (Priority 99998): Level=' . ob_get_level() . ', Length=' . ob_get_length() );
+}, 99998 ); // Priority 99998 is just before our very late ENDED log at 99999
+
+// --- End of New Debug Snippets for Output Buffering ---
